@@ -2,12 +2,13 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { validate } from 'class-validator';
 import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
-import { EntityManager, wrap } from '@mikro-orm/core';
+import {EntityDTO, EntityManager, wrap} from '@mikro-orm/core';
 import { SECRET } from '../config';
 import { CreateUserDto, LoginUserDto, UpdateUserDto } from './dto';
 import { User } from './user.entity';
-import { IUserRO } from './user.interface';
+import {IUserRO, UserStats} from './user.interface';
 import { UserRepository } from './user.repository';
+import {Article} from "../article/article.entity";
 
 @Injectable()
 export class UserService {
@@ -114,4 +115,35 @@ export class UserService {
 
     return { user: userRO };
   }
+
+  async getAuthorRanking(): Promise<UserStats[]> {
+    const users = await this.userRepository.findAll({ populate: ['articles'] });
+
+    const userRanks: UserStats[] = [];
+
+    for (const user of users) {
+      const articles = user.articles.toArray();
+      const totalArticles = articles.length;
+      const totalLikes = articles.reduce((sum: number, article: EntityDTO<Article>) => sum + (article.favoritesCount || 0), 0);
+
+      const firstArticleDate = totalArticles > 0
+        ? articles
+          .sort((a: EntityDTO<Article>, b: EntityDTO<Article>) => a.createdAt.getTime() - b.createdAt.getTime())[0]
+          .createdAt.toISOString()
+        : null;
+
+      userRanks.push({
+        name: user.username,
+        profileLink: `/profile/${user.username}`,
+        totalArticles,
+        totalLikes,
+        firstArticleDate,
+      });
+    }
+
+    userRanks.sort((a, b) => (b?.totalLikes ?? 0) - (a?.totalLikes ?? 0));
+
+    return userRanks;
+  }
+
 }
