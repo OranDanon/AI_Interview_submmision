@@ -1,1 +1,58 @@
-<p>TODO</p>
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Page Title</title>
+</head>
+<body>
+
+<h1>Conduit Roaster</h1>
+
+<!--<table style="width:100%">-->
+<!--  <tr>-->
+<!--    <th>User Name & Profile Link</th>-->
+<!--    <th>Total Number of Articles Authored</th>-->
+<!--    <th>Total Likes</th>-->
+<!--    <th>Date of First Article</th>-->
+<!--  </tr>-->
+
+<!--  <tr *ngFor="let user of roster$ | async">-->
+<!--    <td>{{ user.username }}</td>-->
+<!--    <td>{{ user.totalArticles }}</td>-->
+<!--    <td>{{ user.totalLikes }}</td>-->
+<!--    <td>{{ user.firstArticleDate }}</td>-->
+<!--  </tr>-->
+
+<!--</table>-->
+
+<div class="roster-page">
+  <div class="banner">
+    <div class="container">
+      <h1 data-e2e-id="roster-title">User Roster</h1>
+    </div>
+  </div>
+
+  <div class="container page">
+    <div class="row roster-content">
+      <div class="col-md-12">
+        <table style="width:100%">
+          <tr>
+            <th>User Name & Profile Link</th>
+            <th>Total Number of Articles Authored</th>
+            <th>Total Likes</th>
+            <th>Date of First Article</th>
+          </tr>
+
+          <tr *ngFor="let user of roster$ | async">
+            <td><a href="{{ user.profileLink }}">{{ user.name }}</a></td>
+            <td>{{ user.totalArticles }}</td>
+            <td>{{ user.totalLikes }}</td>
+            <td>{{ user.firstArticleDate }}</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

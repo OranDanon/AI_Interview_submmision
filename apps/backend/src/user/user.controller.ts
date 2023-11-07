@@ -2,9 +2,8 @@ import { Body, Controller, Delete, Get, HttpException, Param, Post, Put, UsePipe
 import { ValidationPipe } from '../shared/pipes/validation.pipe';
 import { CreateUserDto, LoginUserDto, UpdateUserDto } from './dto';
 import { User } from './user.decorator';
-import { IUserRO } from './user.interface';
+import {IUserRO, UserStats} from './user.interface';
 import { UserService } from './user.service';
-
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 @ApiBearerAuth()
@@ -43,9 +42,15 @@ export class UserController {
     if (!foundUser) {
       throw new HttpException({ errors }, 401);
     }
+
     const token = await this.userService.generateJWT(foundUser);
     const { email, username, bio, image } = foundUser;
     const user = { email, token, username, bio, image };
     return { user };
+  }
+
+  @Get('users/roster')
+  async getRoster(): Promise<UserStats[]> {
+    return this.userService.getAuthorRanking();
   }
 }
